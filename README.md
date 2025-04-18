@@ -2,28 +2,17 @@
 
 https://hub.docker.com/r/microsoft/mssql-server
 
-## docker pull
-
 docker pull mcr.microsoft.com/mssql/server:2022-latest
-
-### Docker volume :
 
 docker volume create mssql_data
 
-# GIT CLONE INSTALL POLYBASE
+# BUILD
 
-git clone https://github.com/microsoft/mssql-docker.git
+cd mssql-server2022
+docker compose build --no-cache
+docker compose up -d
 
-# CONNEXION CLIENT
-
-## CLIENT MSSQL-TOOLS
-
-docker run -it --rm --network host -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Str0ngPASSWD!' mcr.microsoft.com/mssql-tools
-
-sqlcmd -S localhost,1433 -U sa -P "Str0ngPASSWD!"
-GO
-
-## CLIENT LOURD
+# CONNEXION CLIENT SSMS
 
 https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssms?utm_source=chatgpt.com
 
@@ -33,23 +22,15 @@ Connexion : sa
 Mot de passe : StrongPASSWD!
 Chiffrement : Facultatif
 
-### check option available :
-
-SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS IsPolyBaseInstalled;
-
-### check option enabled
-
-SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled';
-
 ## check si polybase est up
 
-docker compose build --no-cache
-docker compose up -d
+docker exec -u root -it sqlserver bash
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
 
 SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
 (SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled') AS Enabled;
 
-## activer manuellement polybase
+# If needed, activate manually
 
 docker exec -u root -it sqlserver bash
 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
