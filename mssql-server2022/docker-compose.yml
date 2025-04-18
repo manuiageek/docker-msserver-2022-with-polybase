@@ -20,4 +20,3 @@ services:
 
 volumes:
   mssql_data:
-    external: true

@@ -45,3 +45,7 @@ SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled';
 
 docker compose build --no-cache
 docker compose up -d
+
+SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
+(SELECT value_in_use FROM sys.configurations
+WHERE name = 'polybase enabled') AS Enabled;
