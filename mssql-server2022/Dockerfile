@@ -17,14 +17,17 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] \
 # --- Étape 3 : installation PolyBase + Extensibility --------
 RUN apt-get update && \
     ACCEPT_EULA=Y apt-get install -y \
+    mssql-tools \
+    unixodbc-dev \
     mssql-server-polybase \
     mssql-server-extensibility && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # --- Étape 4 : activer PolyBase AVANT le premier boot -------
-# RUN /opt/mssql/bin/mssql-conf -n set polybase.enabled true && \
-# chown -R mssql:mssql /var/opt/mssql
+# RUN /opt/mssql/bin/mssql-conf -n set polybase.enabled true
 
-# --- Étape 5 : démarrage du moteur -------------------------
+COPY enable-polybase.sh /enable-polybase.sh
+RUN chmod +x /enable-polybase.sh
+
 USER mssql
-CMD ["/opt/mssql/bin/sqlservr"]
+CMD /opt/mssql/bin/sqlservr & /enable-polybase.sh && wait

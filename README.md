@@ -47,5 +47,13 @@ docker compose build --no-cache
 docker compose up -d
 
 SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
-(SELECT value_in_use FROM sys.configurations
-WHERE name = 'polybase enabled') AS Enabled;
+(SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled') AS Enabled;
+
+## activer manuellement polybase
+
+docker exec -u root -it sqlserver bash
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
+exec sp_configure 'polybase enabled', 1
+GO
+RECONFIGURE WITH OVERRIDE
+GO
