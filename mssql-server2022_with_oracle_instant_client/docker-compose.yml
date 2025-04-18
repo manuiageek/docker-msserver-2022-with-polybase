@@ -1,0 +1,22 @@
+services:
+  sqlserver:
+    build: .
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Str0ngPASSWD!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $$SA_PASSWORD -Q "SELECT 1"
+        || exit 1
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+volumes:
+  mssql_data:

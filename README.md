@@ -12,7 +12,7 @@ cd mssql-server2022
 docker compose build --no-cache
 docker compose up -d
 
-# CONNEXION CLIENT SSMS
+# CONNECTION CLIENT SSMS
 
 https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssms?utm_source=chatgpt.com
 
@@ -38,3 +38,14 @@ exec sp_configure 'polybase enabled', 1
 GO
 RECONFIGURE WITH OVERRIDE
 GO
+
+# Installation of oracle client
+
+https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html
+
+Download : instantclient-basiclite-linux.x64-XX.X.X.X.X.zip
+
+## Vérifier si oracle-instantclient est bien installé
+
+docker exec -it sqlserver ls /opt/oracle-instantclient
+docker exec -it sqlserver ldd /opt/oracle-instantclient/libclntsh.so
