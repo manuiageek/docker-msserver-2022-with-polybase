@@ -1,0 +1,24 @@
+services:
+  dc1:
+    image: diegogslomp/samba-ad-dc:4.21.4
+    container_name: dc1
+    hostname: dc1
+    network_mode: "host"
+    privileged: true
+    environment:
+      - REALM=EXEMPLE.LOCAL
+      - DOMAIN=EXEMPLE
+      - ADMIN_PASS=Str0ngPASSWD!
+      - DNS_FORWARDER=8.8.8.8
+    volumes:
+      - dc1_etc:/usr/local/samba/etc
+      - dc1_private:/usr/local/samba/private
+      - dc1_var:/usr/local/samba/var
+
+volumes:
+  dc1_etc:
+    external: true
+  dc1_private:
+    external: true
+  dc1_var:
+    external: true

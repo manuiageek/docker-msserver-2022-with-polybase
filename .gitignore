@@ -1,1 +1,2 @@
-**/instantclient-basiclite-linux.x64-23.7.0.25.01.zip
+**/*.zip
+oracledb_docker/docker-images
