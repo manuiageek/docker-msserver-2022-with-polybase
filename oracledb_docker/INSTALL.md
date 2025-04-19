@@ -36,15 +36,25 @@ DATABASE IS READY TO USE!
 
 #### Oracle SQL Developer
 
-Nom de connexion: XE‑CDB
-Nom d’utilisateur: SYS
+Nom de connexion: XEPDB1‑PDB
+Nom d’utilisateur: PDBADMIN
 Mot de passe: Str0ngPASSWD123
-Rôle: SYSDBA (uniquement si vous utilisez SYS)
+Rôle: par défaut
 Hôte: localhost
 Port: 1521
-SID: XE (cochez SID)
+Nom de service : XEPDB1
 
-SELECT username, account_status FROM dba_users ORDER BY username;
+#### test sql
+
+SELECT username FROM all_users ORDER BY username;
+
+#### give PBADMIN user some rights
+
+docker exec -it oracle-21-build bash
+sqlplus sys/Str0ngPASSWD123@XEPDB1 AS SYSDBA
+ALTER SESSION SET CONTAINER = XEPDB1;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, DROP ANY TABLE, DROP ANY VIEW, DROP ANY SEQUENCE, ALTER ANY TABLE, ALTER ANY SEQUENCE, UNLIMITED TABLESPACE TO PDBADMIN CONTAINER=CURRENT;
+GRANT UNLIMITED TABLESPACE TO PDBADMIN CONTAINER=CURRENT;
 
 ### try a dataset like mine
 
