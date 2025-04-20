@@ -15,5 +15,12 @@ services:
       ORACLE_CHARACTERSET: AL32UTF8
     volumes:
       - oracle-data:/opt/oracle/oradata
+    networks:
+      - dbnet              
+
+networks:
+  dbnet:
+    external: true
+
 volumes:
   oracle-data:

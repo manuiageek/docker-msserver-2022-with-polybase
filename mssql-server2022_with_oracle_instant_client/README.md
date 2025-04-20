@@ -6,6 +6,8 @@ docker pull mcr.microsoft.com/mssql/server:2022-latest
 
 docker volume create mssql_data
 
+docker network create dbnet
+
 # BUILD
 
 cd mssql-server2022
@@ -49,3 +51,10 @@ Download : instantclient-basiclite-linux.x64-XX.X.X.X.X.zip
 
 docker exec -it sqlserver ls /opt/oracle-instantclient
 docker exec -it sqlserver ldd /opt/oracle-instantclient/libclntsh.so
+
+# Test polybase
+
+docker exec -u root -it sqlserver bash
+cat /etc/odbcinst.ini
+cat /etc/odbc.ini
+isql -v OracleXEPDB1 PDBADMIN Str0ngPASSWD123

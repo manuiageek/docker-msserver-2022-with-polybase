@@ -17,6 +17,13 @@ services:
       interval: 10s
       start_period: 10s
       retries: 5
+    networks:
+      - dbnet
+
+networks:
+  dbnet:
+    external: true
 
 volumes:
   mssql_data:
+

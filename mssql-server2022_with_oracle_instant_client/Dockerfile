@@ -1,42 +1,71 @@
 FROM mcr.microsoft.com/mssql/server:2022-latest
 
-# --- Étape 1 : dépendances de base --------------------------
 USER root
+
+# Installer dépendances de base et éditeur
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl ca-certificates gnupg apt-transport-https unzip libaio1
+    curl \
+    ca-certificates \
+    gnupg \
+    apt-transport-https \
+    libaio1 \
+    unixodbc-dev \
+    nano \
+    unzip && \
+    rm -rf /var/lib/apt/lists/*
 
-# --- Étape 2 : dépôt Microsoft + clé GPG --------------------
+# Ajouter dépôt Microsoft et installer PolyBase et outils SQL Server
 RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
-    | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
-
-RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] \
+    | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] \
     https://packages.microsoft.com/ubuntu/22.04/mssql-server-2022 jammy main" \
-    > /etc/apt/sources.list.d/mssql-server-2022.list
-
-# --- Étape 3 : installation PolyBase + Extensibility --------
-RUN apt-get update && \
+    > /etc/apt/sources.list.d/mssql-server-2022.list && \
+    apt-get update && \
     ACCEPT_EULA=Y apt-get install -y \
     mssql-tools \
-    unixodbc-dev \
     mssql-server-polybase \
     mssql-server-extensibility && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
-# --- Étape 4 : Installation de l'Oracle Instant Client ------
-COPY instantclient*.zip /tmp/
-RUN cd /opt && \
-    unzip /tmp/instantclient*.zip && \
-    rm /tmp/instantclient*.zip && \
-    ln -s /opt/instantclient_* /opt/oracle-instantclient && \
-    echo /opt/oracle-instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+# Installer Oracle Instant Client Basic et ODBC
+COPY instantclient-basic*.zip instantclient-odbc*.zip /tmp/
+RUN mkdir -p /opt/oracle && \
+    unzip -o -q /tmp/instantclient-basic*.zip -d /opt/oracle && \
+    unzip -o -q /tmp/instantclient-odbc*.zip  -d /opt/oracle && \
+    rm /tmp/instantclient-*.zip && \
+    ln -s /opt/oracle/instantclient_* /opt/oracle/instantclient && \
+    echo "/opt/oracle/instantclient" > /etc/ld.so.conf.d/oracle-instantclient.conf && \
     ldconfig
 
-ENV LD_LIBRARY_PATH="/opt/oracle-instantclient:${LD_LIBRARY_PATH}"
+# Créer et configurer tnsnames.ora pour l'alias XEPDB1
+RUN mkdir -p /opt/oracle/instantclient/network/admin && \
+    printf "XEPDB1 =\n  (DESCRIPTION =\n    (ADDRESS=(PROTOCOL=TCP)(HOST=oracle)(PORT=1521))\n    (CONNECT_DATA=(SERVICE_NAME=XEPDB1))\n  )\n" > /opt/oracle/instantclient/network/admin/tnsnames.ora
 
-# --- Étape 5 : activer PolyBase AVANT le premier boot -------
-# RUN /opt/mssql/bin/mssql-conf -n set polybase.enabled true
+# Déclarer le pilote dans unixODBC
+RUN cat <<'EOF' > /etc/odbcinst.ini
+[OracleODBC-23]
+Description = Oracle ODBC driver for Instant Client
+Driver      = /opt/oracle/instantclient/libsqora.so.23.1 
+Setup       = /opt/oracle/instantclient/libodbcinst.so
+EOF
 
+# Créer le DSN utilisant l'alias TNS
+RUN cat <<'EOF' > /etc/odbc.ini
+[OracleXEPDB1]
+Driver     = OracleODBC-23
+ServerName = XEPDB1
+Uid        = PDBADMIN
+Pwd        = Str0ngPASSWD!
+EOF
+
+# Variables d'environnement Oracle
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient:${LD_LIBRARY_PATH} \
+    PATH=/opt/oracle/instantclient:${PATH} \
+    TNS_ADMIN=/opt/oracle/instantclient/network/admin \
+    ORACLE_HOME=/opt/oracle/instantclient
+
+# Copier et rendre exécutable le script d'activation de PolyBase
 COPY enable-polybase.sh /enable-polybase.sh
 RUN chmod +x /enable-polybase.sh
 
