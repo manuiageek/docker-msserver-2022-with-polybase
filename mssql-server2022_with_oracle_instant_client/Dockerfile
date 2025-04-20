@@ -56,7 +56,7 @@ RUN cat <<'EOF' > /etc/odbc.ini
 Driver     = OracleODBC-23
 ServerName = XEPDB1
 Uid        = PDBADMIN
-Pwd        = Str0ngPASSWD!
+Pwd        = Str0ngPASSWD123
 EOF
 
 # Variables d'environnement Oracle
