@@ -19,7 +19,7 @@ https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssm
 Nom serveur : localhost, 1433
 Authentification : Authentification SQL Server
 Connexion : sa
-Mot de passe : StrongPASSWD!
+Mot de passe : Str0ngPASSWD!
 Chiffrement : Facultatif
 
 ## check si polybase est up
