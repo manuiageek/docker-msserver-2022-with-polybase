@@ -44,19 +44,22 @@ RUN mkdir -p /opt/oracle/instantclient/network/admin && \
 
 # Déclarer le pilote dans unixODBC
 RUN cat <<'EOF' > /etc/odbcinst.ini
-[OracleODBC-23]
+[OracleODBC-19]
 Description = Oracle ODBC driver for Instant Client
-Driver      = /opt/oracle/instantclient/libsqora.so.23.1 
+Driver      = /opt/oracle/instantclient/libsqora.so.19.1 
 Setup       = /opt/oracle/instantclient/libodbcinst.so
 EOF
 
 # Créer le DSN utilisant l'alias TNS
 RUN cat <<'EOF' > /etc/odbc.ini
 [OracleXEPDB1]
-Driver     = OracleODBC-23
-ServerName = XEPDB1
-Uid        = PDBADMIN
-Pwd        = Str0ngPASSWD123
+Driver      = OracleODBC-19
+Description = Oracle Database PDB
+ServerName  = XEPDB1
+Database    = XEPDB1
+UserID      = PDBADMIN
+Password    = Str0ngPASSWD123
+Port        = 1521
 EOF
 
 # Variables d'environnement Oracle

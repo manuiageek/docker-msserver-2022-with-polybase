@@ -16,7 +16,7 @@ docker compose up -d
 
 # CONNECTION CLIENT SSMS
 
-https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssms?utm_source=chatgpt.com
+https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssms
 
 Nom serveur : localhost, 1433
 Authentification : Authentification SQL Server
@@ -42,7 +42,8 @@ SELECT \* FROM sys.dm_exec_compute_nodes;
 
 https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html
 
-Download : instantclient-basiclite-linux.x64-XX.X.X.X.X.zip
+Download : instantclient-basic-linux.x64-19.26.0.0.0dbru.zip
+Download : instantclient-odbc-linux.x64-19.26.0.0.0dbru.zip
 
 ## Vérifier si oracle-instantclient est bien installé
 
@@ -55,3 +56,8 @@ docker exec -u root -it sqlserver bash
 cat /etc/odbcinst.ini
 cat /etc/odbc.ini
 isql -v OracleXEPDB1 PDBADMIN Str0ngPASSWD123
+
+# Troubleshooting
+
+docker exec -it sqlserver bash -c "cat /var/opt/mssql/log/polybase/MSSQLSERVER_localhost_DWEngine_errors.log | tail -n 50"
+docker exec -it sqlserver bash -c "cat /var/opt/mssql/log/polybase/MSSQLSERVER_localhost_DWEngine_server.log | grep -i 'oracle\|odbc\|error' | tail -n 50"

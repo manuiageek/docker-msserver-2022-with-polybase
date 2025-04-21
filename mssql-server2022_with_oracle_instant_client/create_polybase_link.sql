@@ -25,21 +25,20 @@ GO
 DROP EXTERNAL DATA SOURCE OracleSource;
 GO
 
-CREATE EXTERNAL DATA SOURCE OracleSource WITH (
-    LOCATION = 'odbc://oracle',
-    CONNECTION_OPTIONS = 'DSN=OracleXEPDB1;Uid=PDBADMIN;Pwd=Str0ngPASSWD123;ServerName=XEPDB1;Port=1521',
+CREATE EXTERNAL DATA SOURCE OracleSource
+WITH (
+    LOCATION = 'oracle://oracle:1521',
     CREDENTIAL = OracleCredential
 );
+
 
 ------------------------------------------------------------------
 -- Étape 4 : table externe
 ------------------------------------------------------------------
-IF EXISTS (SELECT * FROM sys.external_tables WHERE name = 'ventes_legumes_ext')
+IF OBJECT_ID('dbo.ventes_legumes_ext') IS NOT NULL
     DROP EXTERNAL TABLE dbo.ventes_legumes_ext;
 GO
-
-CREATE EXTERNAL TABLE dbo.ventes_legumes_ext
-(
+CREATE EXTERNAL TABLE dbo.ventes_legumes_ext (
     ID          FLOAT NOT NULL,
     NOM_LEGUME  VARCHAR(50) COLLATE Latin1_General_100_BIN2_UTF8,
     TYPE_LEGUME VARCHAR(50) COLLATE Latin1_General_100_BIN2_UTF8,
@@ -50,8 +49,7 @@ CREATE EXTERNAL TABLE dbo.ventes_legumes_ext
     VENTE_Q4    FLOAT
 )
 WITH (
-    LOCATION    = 'XEPDB1.PDBADMIN.VENTES_LEGUMES',
+    LOCATION = '[XEPDB1].PDBADMIN.VENTES_LEGUMES',
     DATA_SOURCE = OracleSource
 );
 GO
-

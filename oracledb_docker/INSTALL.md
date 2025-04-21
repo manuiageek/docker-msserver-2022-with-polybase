@@ -26,7 +26,7 @@ docker volume create oracle-data
 
 cd oracledb_docker
 docker-compose up -d
-docker logs -f oracle-21-build
+docker logs -f oracle
 
 #### and wait for :
 
@@ -50,7 +50,7 @@ SELECT username FROM all_users ORDER BY username;
 
 #### give PBADMIN user some rights
 
-docker exec -it oracle-21-build bash
+docker exec -it oracle bash
 sqlplus sys/Str0ngPASSWD123@XEPDB1 AS SYSDBA
 ALTER SESSION SET CONTAINER = XEPDB1;
 GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, DROP ANY TABLE, DROP ANY VIEW, DROP ANY SEQUENCE, ALTER ANY TABLE, ALTER ANY SEQUENCE, UNLIMITED TABLESPACE TO PDBADMIN CONTAINER=CURRENT;
@@ -59,3 +59,10 @@ GRANT UNLIMITED TABLESPACE TO PDBADMIN CONTAINER=CURRENT;
 ### try a dataset like mine
 
 ventes_legumes.sql
+
+docker exec -it oracle bash
+sqlplus sys/Str0ngPASSWD123@XEPDB1 AS SYSDBA
+GRANT ALL PRIVILEGES ON PDBADMIN.VENTES_LEGUMES TO PDBADMIN;
+GRANT CREATE ANY DIRECTORY TO PDBADMIN;
+GRANT READ, WRITE ON DIRECTORY DATA_PUMP_DIR TO PDBADMIN;
+GRANT EXECUTE ON DBMS_LOCK TO PDBADMIN;
