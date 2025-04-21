@@ -52,6 +52,8 @@ docker exec -it sqlserver ldd /opt/oracle-instantclient/libclntsh.so
 
 # Test polybase
 
+https://learn.microsoft.com/en-us/sql/relational-databases/polybase/polybase-configure-oracle?view=sql-server-ver16
+
 docker exec -u root -it sqlserver bash
 cat /etc/odbcinst.ini
 cat /etc/odbc.ini

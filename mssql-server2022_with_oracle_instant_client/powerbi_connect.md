@@ -1,8 +1,8 @@
-https://vyaskn.tripod.com/row_level_security_in_sql_server_databases.htm?utm_source=chatgpt.com
-
-https://novacontext.com/sql-server-2016-dynamic-data-masking-and-row-level-security-deployment-guide/index.html?utm_source=chatgpt.com
-
 https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security?view=sql-server-ver16&utm_source=chatgpt.com
+
+https://medium.com/%40qays.daoud/kerberos-for-busy-admins-a-practical-guide-to-power-bi-sso-387b8acfb68a
+
+https://learn.microsoft.com/en-us/power-bi/connect-data/service-gateway-sso-overview#supported-data-sources-for-sso
 
 # Création de la fonction de prédicat
 
