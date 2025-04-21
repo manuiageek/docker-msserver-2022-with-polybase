@@ -1,7 +1,7 @@
 services:
   oracle:
     image: oracle/database:21.3.0-xe
-    container_name: oracle-21-build
+    container_name: oracle
     shm_size: "2g"         # /dev/shm ≥ 1 Go sinon SGA échoue :contentReference[oaicite:2]{index=2}
     cpus: "4"              # limite à 4 cœurs → SGA mini = 1600M :contentReference[oaicite:3]{index=3}    
     restart: unless-stopped

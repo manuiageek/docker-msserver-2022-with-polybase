@@ -32,14 +32,11 @@ docker exec -u root -it sqlserver bash
 SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
 (SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled') AS Enabled;
 
-# If needed, activate manually
+-- Vérifier l'installation de PolyBase
+SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS IsPolyBaseInstalled;
 
-docker exec -u root -it sqlserver bash
-/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
-exec sp_configure 'polybase enabled', 1
-GO
-RECONFIGURE WITH OVERRIDE
-GO
+-- Vérifier que le service d'exécution externe est en cours d'exécution
+SELECT \* FROM sys.dm_exec_compute_nodes;
 
 # Installation of oracle client
 

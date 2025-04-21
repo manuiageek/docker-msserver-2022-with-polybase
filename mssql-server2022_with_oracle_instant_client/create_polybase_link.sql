@@ -1,79 +1,57 @@
--- Gestion de la clé maître
+-- https://learn.microsoft.com/fr-fr/sql/relational-databases/polybase/polybase-configure-oracle?view=sql-server-ver16
+-- Sélectionner une base de données utilisateur (remplacer 'VotreBaseDeDonnees' par le nom de votre base)
+USE FRUITS;
+GO
+
+--------------------------------------------------------------
+-- Étape 1 : clé maître (ignore le CREATE si elle existe déjà)
+--------------------------------------------------------------
 IF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name LIKE '%DatabaseMasterKey%')
-BEGIN
-    -- Créer la clé maître pour chiffrer les informations d'identification
     CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'P@55w0rd_M@5t3r#K3y!2025$PolyB@se';
-    PRINT 'Clé maître créée avec succès';
-END
-ELSE
-BEGIN
-    PRINT 'La clé maître existe déjà';
-END
+GO
 
--- Gestion des informations d'identification
+------------------------------------------------------------------
+-- Étape 2 : credential Oracle
+------------------------------------------------------------------
 IF NOT EXISTS (SELECT * FROM sys.database_credentials WHERE name = 'OracleCredential')
-BEGIN
-    -- Créer les informations d'identification
-    CREATE DATABASE SCOPED CREDENTIAL OracleCredential WITH IDENTITY = 'PDBADMIN', SECRET = 'Str0ngPASSWD123';
-    PRINT 'Identifiant de base de données créé avec succès';
-END
-ELSE
-BEGIN
-    PRINT 'L''identifiant OracleCredential existe déjà';
-    -- Si vous souhaitez recréer les identifiants, décommentez ces lignes
-    -- DROP DATABASE SCOPED CREDENTIAL OracleCredential;
-    -- CREATE DATABASE SCOPED CREDENTIAL OracleCredential WITH IDENTITY = 'PDBADMIN', SECRET = 'Str0ngPASSWD123';
-END
+    CREATE DATABASE SCOPED CREDENTIAL OracleCredential
+        WITH IDENTITY = 'PDBADMIN',
+             SECRET   = 'Str0ngPASSWD123';
+GO
 
--- Gestion de la source de données externe
-IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'OracleSource')
-BEGIN
-    -- Créer la source de données externe pointant vers Oracle
-    CREATE EXTERNAL DATA SOURCE OracleSource 
-    WITH (
-        LOCATION = 'odbc://oracle:1521',
-        CONNECTION_OPTIONS = 'DSN=OracleXEPDB1',
-        CREDENTIAL = OracleCredential
-    );
-    PRINT 'Source de données externe créée avec succès';
-END
-ELSE
-BEGIN
-    PRINT 'La source de données OracleSource existe déjà';
-    -- Si vous souhaitez recréer la source, décommentez ces lignes
-    -- DROP EXTERNAL DATA SOURCE OracleSource;
-    -- CREATE EXTERNAL DATA SOURCE OracleSource 
-    -- WITH (
-    --     LOCATION = 'odbc://oracle:1521',
-    --     CONNECTION_OPTIONS = 'DSN=OracleXEPDB1',
-    --     CREDENTIAL = OracleCredential
-    -- );
-END
+------------------------------------------------------------------
+-- Étape 3 : external data source
+------------------------------------------------------------------
+DROP EXTERNAL DATA SOURCE OracleSource;
+GO
 
--- Gestion de la table externe
-IF NOT EXISTS (SELECT * FROM sys.external_tables WHERE name = 'ventes_legumes_ext')
-BEGIN
-    -- Créer une table externe correspondant à la table des légumes dans Oracle
-    CREATE EXTERNAL TABLE ventes_legumes_ext (
-        id INT,
-        nom_legume NVARCHAR(50),
-        type_legume NVARCHAR(50),
-        ville NVARCHAR(50),
-        vente_q1 INT,
-        vente_q2 INT,
-        vente_q3 INT,
-        vente_q4 INT
-    )
-    WITH (
-        LOCATION = 'ventes_legumes',
-        DATA_SOURCE = OracleSource
-    );
-    PRINT 'Table externe créée avec succès';
-END
-ELSE
-BEGIN
-    PRINT 'La table externe ventes_legumes_ext existe déjà';
-    -- Si vous souhaitez recréer la table, décommentez ces lignes
-    -- DROP EXTERNAL TABLE ventes_legumes_ext;
-    -- CREATE EXTERNAL TABLE ventes_legumes_ext (...)
-END
+CREATE EXTERNAL DATA SOURCE OracleSource WITH (
+    LOCATION = 'odbc://oracle',
+    CONNECTION_OPTIONS = 'DSN=OracleXEPDB1;Uid=PDBADMIN;Pwd=Str0ngPASSWD123;ServerName=XEPDB1;Port=1521',
+    CREDENTIAL = OracleCredential
+);
+
+------------------------------------------------------------------
+-- Étape 4 : table externe
+------------------------------------------------------------------
+IF EXISTS (SELECT * FROM sys.external_tables WHERE name = 'ventes_legumes_ext')
+    DROP EXTERNAL TABLE dbo.ventes_legumes_ext;
+GO
+
+CREATE EXTERNAL TABLE dbo.ventes_legumes_ext
+(
+    ID          FLOAT NOT NULL,
+    NOM_LEGUME  VARCHAR(50) COLLATE Latin1_General_100_BIN2_UTF8,
+    TYPE_LEGUME VARCHAR(50) COLLATE Latin1_General_100_BIN2_UTF8,
+    VILLE       VARCHAR(50) COLLATE Latin1_General_100_BIN2_UTF8,
+    VENTE_Q1    FLOAT,
+    VENTE_Q2    FLOAT,
+    VENTE_Q3    FLOAT,
+    VENTE_Q4    FLOAT
+)
+WITH (
+    LOCATION    = 'XEPDB1.PDBADMIN.VENTES_LEGUMES',
+    DATA_SOURCE = OracleSource
+);
+GO
+
