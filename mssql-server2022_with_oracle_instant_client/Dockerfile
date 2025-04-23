@@ -3,16 +3,9 @@ FROM mcr.microsoft.com/mssql/server:2022-latest
 USER root
 
 # Installer dépendances de base et éditeur
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl \
-    ca-certificates \
-    gnupg \
-    apt-transport-https \
-    libaio1 \
-    unixodbc-dev \
-    nano \
-    unzip && \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates gnupg apt-transport-https libaio1 \
+    unixodbc-dev nano unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # Ajouter dépôt Microsoft et installer PolyBase et outils SQL Server
@@ -26,7 +19,7 @@ RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
     mssql-tools \
     mssql-server-polybase \
     mssql-server-extensibility && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*    
 
 # Installer Oracle Instant Client Basic et ODBC
 COPY instantclient-basic*.zip instantclient-odbc*.zip /tmp/
@@ -43,7 +36,7 @@ RUN mkdir -p /opt/oracle/instantclient/network/admin && \
     printf "XEPDB1 =\n  (DESCRIPTION =\n    (ADDRESS=(PROTOCOL=TCP)(HOST=oracle)(PORT=1521))\n    (CONNECT_DATA=(SERVICE_NAME=XEPDB1))\n  )\n" > /opt/oracle/instantclient/network/admin/tnsnames.ora
 
 # Déclarer le pilote dans unixODBC
-RUN cat <<'EOF' > /etc/odbcinst.ini
+RUN cat <<'EOF' >> /etc/odbcinst.ini
 [OracleODBC-19]
 Description = Oracle ODBC driver for Instant Client
 Driver      = /opt/oracle/instantclient/libsqora.so.19.1 
@@ -66,7 +59,8 @@ EOF
 ENV LD_LIBRARY_PATH=/opt/oracle/instantclient:${LD_LIBRARY_PATH} \
     PATH=/opt/oracle/instantclient:${PATH} \
     TNS_ADMIN=/opt/oracle/instantclient/network/admin \
-    ORACLE_HOME=/opt/oracle/instantclient
+    ORACLE_HOME=/opt/oracle/instantclient \
+    SA_PASSWORD=Str0ngPASSWD!
 
 # Copier et rendre exécutable le script d'activation de PolyBase
 COPY enable-polybase.sh /enable-polybase.sh

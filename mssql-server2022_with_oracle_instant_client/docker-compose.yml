@@ -26,4 +26,4 @@ networks:
 
 volumes:
   mssql_data:
-
+    external: true

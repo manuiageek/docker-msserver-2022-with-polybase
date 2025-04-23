@@ -10,9 +10,22 @@ docker network create dbnet
 
 # BUILD
 
-cd mssql-server2022
+cd mssql-server2022_with_oracle_instant_client
 docker compose build --no-cache
 docker compose up -d
+
+## check si polybase est up
+
+docker exec -u root -it sqlserver bash
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
+
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!' -Q "SELECT 1"
+
+SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
+(SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled') AS Enabled;
+
+-- Vérifier l'installation de PolyBase
+SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS IsPolyBaseInstalled;
 
 # CONNECTION CLIENT SSMS
 
@@ -24,20 +37,6 @@ Connexion : sa
 Mot de passe : Str0ngPASSWD!
 Chiffrement : Facultatif
 
-## check si polybase est up
-
-docker exec -u root -it sqlserver bash
-/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
-
-SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS Installed,
-(SELECT value_in_use FROM sys.configurations WHERE name = 'polybase enabled') AS Enabled;
-
--- Vérifier l'installation de PolyBase
-SELECT SERVERPROPERTY('IsPolyBaseInstalled') AS IsPolyBaseInstalled;
-
--- Vérifier que le service d'exécution externe est en cours d'exécution
-SELECT \* FROM sys.dm_exec_compute_nodes;
-
 # Installation of oracle client
 
 https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html
@@ -47,8 +46,8 @@ Download : instantclient-odbc-linux.x64-19.26.0.0.0dbru.zip
 
 ## Vérifier si oracle-instantclient est bien installé
 
-docker exec -it sqlserver ls /opt/oracle-instantclient
-docker exec -it sqlserver ldd /opt/oracle-instantclient/libclntsh.so
+docker exec -it sqlserver ls /opt/oracle/instantclient
+docker exec -it sqlserver ldd /opt/oracle/instantclient/libclntsh.so
 
 # Test polybase
 
