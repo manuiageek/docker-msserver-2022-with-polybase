@@ -35,7 +35,7 @@ RUN mkdir -p /opt/oracle && \
 RUN mkdir -p /opt/oracle/instantclient/network/admin && \
     printf "XEPDB1 =\n  (DESCRIPTION =\n    (ADDRESS=(PROTOCOL=TCP)(HOST=oracle)(PORT=1521))\n    (CONNECT_DATA=(SERVICE_NAME=XEPDB1))\n  )\n" > /opt/oracle/instantclient/network/admin/tnsnames.ora
 
-# Déclarer le pilote dans unixODBC
+# Déclarer le pilote 
 RUN cat <<'EOF' >> /etc/odbcinst.ini
 [OracleODBC-19]
 Description = Oracle ODBC driver for Instant Client

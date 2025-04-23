@@ -8,6 +8,13 @@ docker volume create mssql_data
 
 docker network create dbnet
 
+# Installation of oracle instant client
+
+https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html
+
+Download : instantclient-basic-linux.x64-19.26.0.0.0dbru.zip
+Download : instantclient-odbc-linux.x64-19.26.0.0.0dbru.zip
+
 # BUILD
 
 cd mssql-server2022_with_oracle_instant_client
@@ -15,6 +22,8 @@ docker compose build --no-cache
 docker compose up -d
 
 ## check si polybase est up
+docker exec -it sqlserver ls /opt/oracle/instantclient
+docker exec -it sqlserver ldd /opt/oracle/instantclient/libclntsh.so
 
 docker exec -u root -it sqlserver bash
 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Str0ngPASSWD!'
@@ -36,18 +45,6 @@ Authentification : Authentification SQL Server
 Connexion : sa
 Mot de passe : Str0ngPASSWD!
 Chiffrement : Facultatif
-
-# Installation of oracle client
-
-https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html
-
-Download : instantclient-basic-linux.x64-19.26.0.0.0dbru.zip
-Download : instantclient-odbc-linux.x64-19.26.0.0.0dbru.zip
-
-## Vérifier si oracle-instantclient est bien installé
-
-docker exec -it sqlserver ls /opt/oracle/instantclient
-docker exec -it sqlserver ldd /opt/oracle/instantclient/libclntsh.so
 
 # Test polybase
 
